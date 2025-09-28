@@ -13,25 +13,61 @@ A simple, "baremetal" Python execution MCP server that supports both HTTP/SSE (C
 - **No Sandboxing**: Direct execution environment - fast and simple
 - **Persistent Environment**: Variables persist between executions until reset
 
+## Requirements
+
+- **Python**: 3.10 or higher
+- **uv**: Modern Python package manager ([installation guide](https://docs.astral.sh/uv/getting-started/installation/))
+
 ## Installation
 
-Using uvx (recommended):
+### For End Users
+
+> **Note**: This package is not yet published to PyPI. For now, please use the development installation method below.
+
+Once published, you will be able to install with:
 
 ```bash
-uvx install mcp-python-baremetal
+# Using uv tool (recommended)
+uv tool install mcp-python-baremetal
+
+# Or with pip
+pip install mcp-python-baremetal
 ```
 
-Or with pip:
+### For Development
+
+**Prerequisites**: Python 3.10+ and [uv](https://docs.astral.sh/uv/) installed.
 
 ```bash
-pip install mcp-python-baremetal
+# Clone the repository
+git clone https://github.com/bugparty/mcp-python-baremetal
+cd mcp-python-baremetal
+
+# Create virtual environment and install dependencies
+uv sync
+
+# Install development dependencies (optional, for testing and linting)
+uv sync --extra dev
 ```
 
 ## Usage
 
+### Development Usage
+
+When developing, use `uv run` to run commands in the project's virtual environment:
+
+```bash
+# All commands should be prefixed with 'uv run' during development
+uv run mcp-python-baremetal --help
+```
+
 ### As MCP Server (for Claude)
 
 ```bash
+# Development
+uv run mcp-python-baremetal serve
+
+# Production (after installation)
 mcp-python-baremetal serve
 ```
 
@@ -42,6 +78,10 @@ This starts the MCP server with stdio transport that Claude can connect to.
 #### FastMCP Server (Recommended)
 
 ```bash
+# Development
+uv run mcp-python-baremetal fastmcp --host 0.0.0.0 --port 8000
+
+# Production (after installation)
 mcp-python-baremetal fastmcp --host 0.0.0.0 --port 8000
 ```
 
@@ -50,6 +90,10 @@ This starts a FastMCP server with SSE transport optimized for ChatGPT integratio
 #### Legacy FastAPI Server
 
 ```bash
+# Development
+uv run mcp-python-baremetal http --host 0.0.0.0 --port 8000
+
+# Production (after installation)
 mcp-python-baremetal http --host 0.0.0.0 --port 8000
 ```
 
@@ -65,26 +109,28 @@ This starts an HTTP server with the following endpoints:
 ### Direct CLI Execution
 
 ```bash
-# Execute code directly
+# Development examples
+uv run mcp-python-baremetal execute "print(np.array([1,2,3]))"
+uv run mcp-python-baremetal execute --file script.py
+uv run mcp-python-baremetal execute --analyze-only "result = np.array([1,2,3]) + torch.ones(3)"
+uv run mcp-python-baremetal execute --no-auto-import "import numpy as np; print(np.array([1,2,3]))"
+
+# Production examples (after installation)
 mcp-python-baremetal execute "print(np.array([1,2,3]))"
-
-# Execute from file
 mcp-python-baremetal execute --file script.py
-
-# Analyze imports only
 mcp-python-baremetal execute --analyze-only "result = np.array([1,2,3]) + torch.ones(3)"
-
-# Disable auto-import
 mcp-python-baremetal execute --no-auto-import "import numpy as np; print(np.array([1,2,3]))"
 ```
 
 ### Other CLI Commands
 
 ```bash
-# List available libraries and their status
-mcp-python-baremetal libraries
+# Development
+uv run mcp-python-baremetal libraries  # List available libraries
+uv run mcp-python-baremetal demo       # Run demo showcasing auto-import
 
-# Run demo showcasing auto-import
+# Production (after installation)
+mcp-python-baremetal libraries
 mcp-python-baremetal demo
 ```
 
@@ -184,16 +230,123 @@ executor.reset_environment()
 
 ## Development
 
+### Setup Development Environment
+
 ```bash
 git clone https://github.com/bugparty/mcp-python-baremetal
 cd mcp-python-baremetal
 
-# Install in development mode
-pip install -e .
+# Create virtual environment and install dependencies
+uv sync
 
-# Run tests
-python -m pytest tests/
+# Install development dependencies (for testing, linting, etc.)
+uv sync --extra dev
 ```
+
+### Development Workflow
+
+```bash
+# Run tests
+uv run pytest
+
+# Run tests with coverage
+uv run pytest --cov=mcp_python_baremetal
+
+# Code formatting and linting
+uv run ruff check                 # Check for issues
+uv run ruff check --fix          # Fix auto-fixable issues
+uv run ruff format               # Format code
+
+# Type checking
+uv run mypy mcp_python_baremetal/
+
+# Security check
+uv run bandit -r mcp_python_baremetal/
+
+# Run the application in development mode
+uv run mcp-python-baremetal execute "print('Hello, World!')"
+```
+
+### Project Structure
+
+```
+mcp-python-baremetal/
+├── mcp_python_baremetal/     # Main package
+│   ├── __init__.py
+│   ├── cli.py               # Command-line interface
+│   ├── executor.py          # Python code execution engine
+│   ├── fastmcp_server.py    # FastMCP server implementation
+│   ├── http_server.py       # HTTP/SSE server implementation
+│   └── server.py            # MCP server implementation
+├── tests/                   # Test suite
+├── examples/                # Usage examples
+├── pyproject.toml          # Project configuration
+├── uv.lock                 # Dependency lock file
+└── README.md               # This file
+```
+
+### Adding Dependencies
+
+```bash
+# Add a new dependency
+uv add package-name
+
+# Add a development dependency
+uv add --dev package-name
+
+# Update dependencies
+uv sync
+
+# Remove a dependency
+uv remove package-name
+```
+
+### Virtual Environment Management
+
+The project uses `uv` for dependency management. The virtual environment is automatically created in `.venv/` when you run `uv sync`.
+
+```bash
+# Activate virtual environment manually (optional)
+source .venv/bin/activate
+
+# Run commands without uv run (when activated)
+mcp-python-baremetal execute "print('Hello!')"
+
+# Deactivate (when done)
+deactivate
+```
+
+## Quick Reference
+
+### Common Development Commands
+
+| Task | Command |
+|------|---------|
+| Setup project | `uv sync` |
+| Install dev dependencies | `uv sync --extra dev` |
+| Run application | `uv run mcp-python-baremetal execute "code"` |
+| Start MCP server | `uv run mcp-python-baremetal serve` |
+| Start HTTP server | `uv run mcp-python-baremetal fastmcp --port 8000` |
+| Run tests | `uv run pytest` |
+| Format code | `uv run ruff format` |
+| Check code | `uv run ruff check` |
+| Type checking | `uv run mypy mcp_python_baremetal/` |
+| Add dependency | `uv add package-name` |
+| Update dependencies | `uv sync` |
+
+### Troubleshooting
+
+**Q: `uv sync` fails with dependency conflicts**  
+A: Make sure you have Python 3.10+ installed. Check with `python --version`.
+
+**Q: Commands hang or seem to freeze**  
+A: Try running with timeout: `timeout 30 uv run mcp-python-baremetal execute "code"`
+
+**Q: Import errors in development**  
+A: Make sure you've run `uv sync` to install all dependencies.
+
+**Q: Want to use system Python instead of virtual environment**  
+A: You can still use `pip install -e .` for development, but `uv` is recommended.
 
 ## License
 
