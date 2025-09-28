@@ -6,7 +6,7 @@ from typing import Any, Dict
 
 from fastmcp import FastMCP
 
-from .executor import PythonExecutor
+from mcp_python_baremetal.executor import PythonExecutor
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -116,7 +116,7 @@ async def get_available_libraries() -> Dict[str, Dict[str, Any]]:
     Returns:
         Dictionary of library aliases and their import information
     """
-    from .executor import COMMON_IMPORTS
+    from mcp_python_baremetal.executor import COMMON_IMPORTS
 
     logger.info("Getting available library information")
 
