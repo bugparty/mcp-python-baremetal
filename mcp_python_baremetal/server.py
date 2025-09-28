@@ -173,6 +173,7 @@ class MCPPythonServer:
         """Run the MCP server."""
         if transport_type == "stdio":
             from mcp.server.stdio import stdio_server
+            from mcp.server import NotificationOptions
 
             async with stdio_server() as (read_stream, write_stream):
                 await self.server.run(
@@ -182,7 +183,7 @@ class MCPPythonServer:
                         server_name="python-baremetal",
                         server_version="0.1.0",
                         capabilities=self.server.get_capabilities(
-                            notification_options=None, experimental_capabilities={}
+                            notification_options=NotificationOptions(), experimental_capabilities={}
                         ),
                     ),
                 )
