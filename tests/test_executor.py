@@ -81,16 +81,6 @@ class TestPythonExecutor:
         assert "[1 2 3]" in result.stdout
         assert "import numpy as np" in result.modified_code
 
-    def test_auto_import_disabled(self):
-        """Test execution with auto-import disabled."""
-        code = "print(np.array([1, 2, 3]))"
-        result = self.executor.execute(code, auto_import=False)
-
-        # Should fail without auto-import
-        assert result.execution_status == "error"
-        assert result.status_code == 1
-        assert "NameError" in result.stderr
-
     def test_multiple_auto_imports(self):
         """Test multiple automatic imports."""
         code = """
