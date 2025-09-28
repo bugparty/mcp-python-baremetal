@@ -39,6 +39,16 @@ This starts the MCP server with stdio transport that Claude can connect to.
 
 ### As HTTP/SSE Server (for ChatGPT Developer)
 
+#### FastMCP Server (Recommended)
+
+```bash
+mcp-python-baremetal fastmcp --host 0.0.0.0 --port 8000
+```
+
+This starts a FastMCP server with SSE transport optimized for ChatGPT integration.
+
+#### Legacy FastAPI Server
+
 ```bash
 mcp-python-baremetal http --host 0.0.0.0 --port 8000
 ```

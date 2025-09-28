@@ -7,7 +7,8 @@ authors = [
 ]
 dependencies = [
     "mcp>=1.0.0",
-    "fastapi>=0.104.0",
+    "fastmcp>=0.2.0",  # Added fastmcp framework
+    "fastapi>=0.104.0",  # Keep for backwards compatibility
     "uvicorn>=0.24.0",
     "sse-starlette>=1.6.0",
     "numpy>=1.24.0",

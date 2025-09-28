@@ -8,6 +8,7 @@ from typing import Optional
 import click
 
 from .executor import PythonExecutor
+from .fastmcp_server import create_fastmcp_server
 from .http_server import HTTPServer
 from .server import MCPPythonServer
 
@@ -44,7 +45,7 @@ def serve(transport: str):
 @click.option("--host", default="0.0.0.0", help="Host to bind the HTTP server to")
 @click.option("--port", default=8000, type=int, help="Port to bind the HTTP server to")
 def http(host: str, port: int):
-    """Start the HTTP/SSE server."""
+    """Start the HTTP/SSE server (legacy FastAPI)."""
     click.echo(f"Starting HTTP server on {host}:{port}...")
 
     async def run_http():
@@ -55,6 +56,22 @@ def http(host: str, port: int):
         asyncio.run(run_http())
     except KeyboardInterrupt:
         click.echo("\nHTTP server stopped.")
+
+
+@cli.command()
+@click.option("--host", default="0.0.0.0", help="Host to bind the FastMCP server to")
+@click.option(
+    "--port", default=8000, type=int, help="Port to bind the FastMCP server to"
+)
+def fastmcp(host: str, port: int):
+    """Start the FastMCP server (recommended for ChatGPT integration)."""
+    click.echo(f"Starting FastMCP server on {host}:{port}...")
+
+    try:
+        server = create_fastmcp_server()
+        server.run(transport="sse", host=host, port=port)
+    except KeyboardInterrupt:
+        click.echo("\nFastMCP server stopped.")
 
 
 @cli.command()
