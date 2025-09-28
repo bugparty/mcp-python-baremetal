@@ -30,6 +30,22 @@ requires-python = ">= 3.8"
 [project.scripts]
 mcp-python-baremetal = "mcp_python_baremetal.cli:main"
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.21.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+    "bandit>=1.7.0",
+    "safety>=2.0.0",
+]
+test = [
+    "pytest>=7.0.0", 
+    "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.21.0",
+]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
@@ -37,6 +53,9 @@ build-backend = "hatchling.build"
 [tool.ruff]
 line-length = 88
 target-version = "py38"
+exclude = [
+    "examples/",  # Examples intentionally use undefined names for auto-import demo
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
@@ -45,3 +64,39 @@ ignore = []
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--verbose",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+]
+
+[tool.coverage.run]
+source = ["mcp_python_baremetal"]
+omit = [
+    "tests/*",
+    "examples/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
