@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "python-baremetal": {
+      "command": "mcp-python-baremetal",
+      "args": ["serve"],
+      "env": {}
+    }
+  }
+}
